@@ -1,0 +1,61 @@
+resources:
+  - name: httpproxy-exporter
+    type: git
+    icon: gitlab
+    source:
+      uri: https://git.ops.craftypenguins.ca/clients/crafty-penguins/software/httpproxy-exporter.git
+      branch: main
+      fetch_tags: true
+      username: ((registry-username))
+      password: ((registry-password))
+
+  - name: httpproxy-exporter-image
+    type: registry-image
+    icon: docker
+    source:
+      repository: ((image-repo-name))/httpproxy-exporter
+      username: ((registry-username))
+      password: ((registry-password))
+      tag: latest
+
+jobs:
+  # Concourse doesn't support job invocation parameters so
+  # the variables need to be 'brought' in from some other system
+  # Perhaps a slack resource the brings in 'commands' to be triggered
+  # with a verison based on a hash of the command/time
+  # - name: create-tenant
+  #   plan:
+  #     - get: httpproxy-exporter-image
+  #     - task: create-tenant
+  #       image: httpproxy-exporter-image
+  #       config:
+  #         platform: linux
+  #         params:
+  #           TENANT_SHORT_NAME: ((tenant-short-name))
+  #           TENANT_LONG_NAME: ((tenant-long-name))
+  #         run:
+  #           path: date
+
+  - name: build-and-push
+    plan:
+      - get: httpproxy-exporter
+        trigger: true
+      - task: build-task-image
+        privileged: true
+        config:
+          platform: linux
+          image_resource:
+            type: registry-image
+            source:
+              repository: concourse/oci-build-task
+          inputs:
+            - name: httpproxy-exporter
+          outputs:
+            - name: image
+          run:
+            path: build
+          params:
+            CONTEXT: httpproxy-exporter
+      - put: httpproxy-exporter-image
+        params:
+          image: image/image.tar
