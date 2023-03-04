@@ -1,8 +1,8 @@
-# httpproxy-exporter
+# httpproxy-prometheus-sd
 
 K8S HttpProxies (Concourse) Prometheus Scrape Targets Exporter
 
-This program will query the K8S API for HttpProxies (Concourse) type.
+Simple tool query the K8S API for HttpProxies (Concourse) objects and expose them as a Prometheus scrape target.
 
 For each one that is annotated with blackbox-monitor: "true" it will
 generate as a JSON response to a query a Prometheus [http_sd_config|https://prometheus.io/docs/prometheus/latest/configuration/configuration/#http_sd_config] formatted list of scrape targets to use with Blackbox Exporter

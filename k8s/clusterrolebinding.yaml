@@ -5,7 +5,6 @@ metadata:
 subjects:
 - kind: ServiceAccount
   name: httpproxies-exporter
-  namespace: monitoring
 roleRef:
   kind: ClusterRole
   name: httpproxies-exporter-clusterrole
